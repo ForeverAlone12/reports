@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ru.idc.reports.venereological.dao.VenereologicalDao">
+
+    <select id="list" resultMap="Result">
+        SELECT
+            i.cartnum, utils.fullfio(i.cartnum) AS fullfio, p.birthday,
+            age(current_date, p.birthday)) AS age, p.sex, sp.authorized_time,
+            sp.resid, tp.test_name,
+            coalesce (r.result, rf.flag_name, r.er_result, err.result_name) AS result,
+            up.username
+        FROM lis.scheduled_profiles sp
+            JOIN gis.invest i ON sp.counter = i.counter
+            JOIN gis.pats p ON p.cartnum = i.cartnum
+            JOIN lis.scheduled_invests si ON si.scheduled_profile = sp.scheduled_profile
+            JOIN lis.scheduled_tests st ON st.scheduled_invest = si.scheduled_invest
+            JOIN lis.rt_test_properties tp ON tp.test = st.test
+            JOIN lis.raw_results r ON r.raw_result = st.raw_result
+            LEFT JOIN lis.er_reference_flags rf ON rf.reference_flag = r.reference_flag
+            LEFT JOIN lis.er_reference_ranges err ON err.reference_range = r.reference_range
+            JOIN refs.rtusers u ON i.creator_user  = u.userid
+            JOIN refs.rtuserrevisions ur ON ur.userid = u.id
+            JOIN refs.rtuserprops up ON up.revisionid = ur.revisionid
+        WHERE sp.authorized_time BETWEEN to_date('2022-01-01','YYYY-MM-DD')
+          AND date_trunc('day', now())
+        ORDER BY sp.authorized_time DESC, i.cartnum DESC;
+    </select>
+
+    <resultMap id="Result" type="ru.idc.reports.venereological.entity.ResultVenereologist">
+        <id     property="cartnum"  column="cartnum"/>
+        <result property="fio"      column="fio" />
+        <result property="birthday" column="birthday" />
+        <result property="age"      column="age" />
+        <result property="sex"      column="sex" />
+        <result property="resid"    column="resid" />
+        <result property="username" column="username" />
+    </resultMap>
+
+</mapper>

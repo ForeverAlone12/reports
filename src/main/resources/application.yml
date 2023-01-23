@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: development
+
+
+  datasource:
+    url: jdbc:postgresql://itnode7.dc-local/dcdb
+    username: gis
+    password: 1
+    driver-class-name: org.postgresql.Driver
+
+
+logging:
+  level:
+    ru: debug
