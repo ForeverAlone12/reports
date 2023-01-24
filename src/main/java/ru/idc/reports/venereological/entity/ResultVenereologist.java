@@ -2,6 +2,9 @@ package ru.idc.reports.venereological.entity;
 
 import lombok.Data;
 
+import java.sql.Date;
+import java.sql.Time;
+
 @Data
 public class ResultVenereologist
 {
@@ -18,22 +21,26 @@ public class ResultVenereologist
     /**
      * Дата рождения.
      */
-    private String birthday;
+    private Date birthday;
 
     /**
      * Возраст.
      */
-    private String age;
+    private Date age;
 
     /**
      * Пол.
      */
     private String sex;
 
+    private Time authorized_time;
+
     /**
      * Код услуги.
      */
     private String resid;
+
+    private String test_name;
 
     /**
      * Пользователь.

@@ -20,8 +20,8 @@
 
 
 	<properties>
-		<java.version>11</java.version>
-		<myBatis.version>2.2.2</myBatis.version>
+		<java.version>17</java.version>
+		<myBatis.version>3.0.0</myBatis.version>
 		<lombok.version>1.18.24</lombok.version>
 	</properties>
 
@@ -68,6 +68,85 @@
 
 	<build>
 		<plugins>
+
+			<!-- 1. Сборка клиентского React-приложения, созданного с помощью Create React App. -->
+			<plugin>
+
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.12.0</version>
+
+				<executions>
+
+					<!-- 1.1. Установка Node.js и менеджера пакетов yarn. -->
+					<execution>
+						<id>install node and yarn</id>
+						<goals>
+							<goal>install-node-and-yarn</goal>
+						</goals>
+						<phase>generate-resources</phase>
+					</execution>
+
+					<!-- 1.2. Установка зависимостей клиентского приложения, перечисленных в package.json. -->
+					<execution>
+						<id>yarn install</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+
+					<!-- 1.3 Создание сборки клиентского приложения для выкладыания на сервер. -->
+					<execution>
+						<id>yarn build</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+
+				</executions>
+
+				<configuration>
+					<nodeVersion>v16.13.0</nodeVersion>
+					<yarnVersion>v1.22.19</yarnVersion>
+					<workingDirectory>src/main/frontend</workingDirectory>
+				</configuration>
+
+			</plugin>
+
+			<!-- 2. Копирование собранного клиентского React-приложения в директорию со статикой Spring Boot-приложения. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>copy resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/classes/static</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/frontend/build</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- 3. Создание выполняемого jar-архива с Spring Boot-приложением. -->
+			<!-- (надо запустить mvn package) -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
